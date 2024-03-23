@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badminton Venue Availability</title>
+</head>
+<body>
+    <h1>Badminton Venue Availability</h1>
+    <label for="datePicker">Select Date:</label>
+    <input type="date" id="datePicker">
+    <button id="fetchDataBtn">Fetch Data</button>
+
+    <div id="venueData"></div>
+
+    <script>
+        const fetchDataBtn = document.getElementById('fetchDataBtn');
+        const datePicker = document.getElementById('datePicker');
+        const venueDataDiv = document.getElementById('venueData');
+
+        fetchDataBtn.addEventListener('click', async () => {
+            const date = datePicker.value;
+            if (!date) {
+                alert('Please select a date.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/process_venues?date=${date}`);
+                const data = await response.json();
+
+                // Clear previous data
+                venueDataDiv.innerHTML = '';
+
+                if (response.ok) {
+                    if (data.venues_with_times.length === 0) {
+                        venueDataDiv.textContent = 'No venues found for the selected date.';
+                    } else {
+                        data.venues_with_times.forEach(venue => {
+                            const venueDiv = document.createElement('div');
+                            venueDiv.innerHTML = `
+                                <h2>${venue.venue_name}</h2>
+                                <p><strong>Location:</strong> ${venue.venue_location}</p>
+                                <h3>Available Times:</h3>
+                            `;
+                            
+                            const timesList = document.createElement('ul');
+                            venue.available_times.forEach(time => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = `${time.starts_at_12h} - ${time.ends_at_12h}, Duration: ${time.duration}, Price: ${time.price}, Location: ${time.location}, Spaces available: ${time.spaces}, Activity: ${time.name}`;
+                                timesList.appendChild(listItem);
+                            });
+
+                            venueDiv.appendChild(timesList);
+                            venueDataDiv.appendChild(venueDiv);
+                        });
+                    }
+                } else {
+                    venueDataDiv.textContent = 'Error fetching data. Please try again later.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                venueDataDiv.textContent = 'An error occurred. Please try again later.';
+            }
+        });
+    </script>
+</body>
+</html>
