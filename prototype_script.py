@@ -2,28 +2,24 @@ import requests
 import time
 import concurrent.futures
 
+BASE_URL = "https://better-admin.org.uk/api/activities"
+HEADERS = {
+    'origin': 'https://bookings.better.org.uk',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+}
+
 def get_venues():
-    base_url_venues = 'https://better-admin.org.uk/api/activities/venues'
-    headers = {
-        'accept': 'application/json',
-        'origin': 'https://bookings.better.org.uk',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-    }
-    response_venues = requests.get(base_url_venues, headers=headers)
+    base_url_venues = f'{BASE_URL}/venues'
+    response_venues = requests.get(base_url_venues, headers=HEADERS)
     data = response_venues.json().get('data', [])
     return data
 
 def get_activities_for_date(venue_id, category_slug, date):
-    base_url_times = f'https://better-admin.org.uk/api/activities/venue/{venue_id}/activity/{category_slug}/times'
-    headers = {
-        'accept': 'application/json',
-        'origin': 'https://bookings.better.org.uk',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-    }
+    base_url_times = f'{BASE_URL}/venue/{venue_id}/activity/{category_slug}/times'
     params = {
         'date': date
     }
-    response_times = requests.get(base_url_times, headers=headers, params=params)
+    response_times = requests.get(base_url_times, headers=HEADERS, params=params)
     data = response_times.json().get('data', [])
     if type(data) is not list:
         return [data]
@@ -32,18 +28,6 @@ def get_activities_for_date(venue_id, category_slug, date):
 
 # Print iterations progress
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    """
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
@@ -136,4 +120,4 @@ def main():
         print("No venues found in the response.")
 
 if __name__ == "__main__":
-    main()
+    main(debug=True)

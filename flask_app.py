@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify, send_file, send_from_directory, render_template
+from flask import Flask, request, jsonify, send_file
 import os
 import time
 import concurrent.futures
 
 # Import functions from your script
-from prototype_script import get_venues, get_activities_for_date, process_venue, print_times_info
+from prototype_script import get_venues, process_venue
 
 app = Flask(__name__)
 
