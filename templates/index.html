@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Badminton Venue Availability</title>
     <link rel="stylesheet" href="./static/styles.css">
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./static/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="container">
         <h1>Badminton Venue Availability</h1>
         <label for="datePicker">Select Date:</label>
-        <input type="date" id="datePicker">
+        <input type="date" id="datePicker" min="{{ min_date }}" max="{{ max_date }}">
         <button id="fetchDataBtn">Fetch Data</button>
 
         <!-- Add loading animation -->

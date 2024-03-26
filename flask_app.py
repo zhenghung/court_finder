@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, render_template
+from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor
 import os
 import time
-import concurrent.futures
 
 # Import functions from your script
 from prototype_script import get_venues, process_venue
@@ -31,7 +32,7 @@ def process_venues():
     # Check if there are London venues
     if london_badminton_venues:
         # Process venues using ThreadPoolExecutor with a fixed number of threads (8 threads)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        with ThreadPoolExecutor(max_workers=8) as executor:
             results = list(executor.map(process_venue, london_badminton_venues, [date]*len(london_badminton_venues)))
 
         available_times_found = [result for result in results if 'available_times' in result]
@@ -88,8 +89,9 @@ def process_venues():
 
 @app.route('/')
 def index():
-    return send_file(os.path.join(STATIC_DIR, 'index.html')) 
-
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    max_date = (datetime.now() + timedelta(days=5)).strftime('%Y-%m-%d')
+    return render_template('index.html', min_date=current_date, max_date=max_date)
 
 if __name__ == "__main__":
     app.run()
