@@ -20,7 +20,10 @@ def get_activities_for_date(venue_id, category_slug, date):
         'date': date
     }
     response_times = requests.get(base_url_times, headers=HEADERS, params=params)
-    data = response_times.json().get('data', [])
+    try:
+        data = response_times.json().get('data', [])
+    except requests.JSONDecodeError:
+        return []
     if type(data) is not list:
         return [data]
     return data
