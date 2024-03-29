@@ -1,32 +1,6 @@
-import requests
+from better_client import get_activities_for_date, get_venues
 import time
 import concurrent.futures
-
-BASE_URL = "https://better-admin.org.uk/api/activities"
-HEADERS = {
-    'origin': 'https://bookings.better.org.uk',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-}
-
-def get_venues():
-    base_url_venues = f'{BASE_URL}/venues'
-    response_venues = requests.get(base_url_venues, headers=HEADERS)
-    data = response_venues.json().get('data', [])
-    return data
-
-def get_activities_for_date(venue_id, category_slug, date):
-    base_url_times = f'{BASE_URL}/venue/{venue_id}/activity/{category_slug}/times'
-    params = {
-        'date': date
-    }
-    response_times = requests.get(base_url_times, headers=HEADERS, params=params)
-    try:
-        data = response_times.json().get('data', [])
-    except requests.JSONDecodeError:
-        return []
-    if type(data) is not list:
-        return [data]
-    return data
 
 
 # Print iterations progress
@@ -57,6 +31,7 @@ def print_times_info(times):
         print(f"Spaces available: {spaces}")
         print(f"Activity: {name}")
 
+
 def process_venue(venue, date):
     venue_id = venue.get('id', '')
     venue_name = venue.get('name', '')
@@ -72,6 +47,7 @@ def process_venue(venue, date):
         return {'venue': venue, 'available_times': available_times}
     else:
         return {'venue': venue, 'no_times': True}
+
 
 def main():
     start = time.time()
@@ -97,6 +73,7 @@ def main():
         venues_with_no_times = {result['venue'].get('slug', '') for result in results if 'no_times' in result}
 
         print("\n=== Completed search ===\n")
+        
         end = time.time()
         print("\nTime elapsed")
         print(end - start)
@@ -122,5 +99,6 @@ def main():
     else:
         print("No venues found in the response.")
 
+
 if __name__ == "__main__":
-    main(debug=True)
+    main()

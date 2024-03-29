@@ -29,7 +29,7 @@ $ python flask_app.py
 
 Run the code in production WSGI server
 ```
-$ waitress-serve flask_app:app
+$ waitress-serve --host localhost flask_app:app
 ```
 You can add specify the `host` and `port` arguments if you wish
 

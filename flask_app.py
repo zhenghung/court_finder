@@ -1,17 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
-import os
 import time
 
 # Import functions from your script
 from prototype_script import get_venues, process_venue
 
 app = Flask(__name__)
-
-# Define the directory path where the index.html file is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 @app.route('/process_venues', methods=['GET'])
 def process_venues():
@@ -94,4 +89,4 @@ def index():
     return render_template('index.html', min_date=current_date, max_date=max_date)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
