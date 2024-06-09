@@ -34,10 +34,6 @@ def print_times_info(times):
 
 def process_venue(venue, date):
     venue_id = venue.get('id', '')
-    venue_name = venue.get('name', '')
-    venue_town = venue.get('town', '')
-    venue_area = venue.get('area', '')
-    venue_postcode = venue.get('postcode', '')
 
     # Fetch activities for the specified date and venue
     times = get_activities_for_date(venue_id, 'badminton-40min', date) + get_activities_for_date(venue_id, 'badminton-60min', date)

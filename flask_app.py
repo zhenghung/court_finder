@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify, render_template
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
@@ -7,6 +8,9 @@ import time
 from prototype_script import get_venues, process_venue
 
 app = Flask(__name__)
+
+# Get API key from environment variable
+google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 @app.route('/process_venues', methods=['GET'])
 def process_venues():
@@ -47,6 +51,8 @@ def process_venues():
             venue_town = venue.get('town', '')
             venue_area = venue.get('area', '')
             venue_postcode = venue.get('postcode', '')
+            venue_lat = venue.get('lat', 0)
+            venue_lng = venue.get('lng', 0)
 
             # Extract available times for the venue
             available_times = result['available_times']
@@ -74,6 +80,10 @@ def process_venues():
                 'venue_name': venue_name,
                 'venue_id': venue_id,
                 'venue_location': f"{venue_town}, {venue_area} - {venue_postcode}",
+                'venue_coord': {
+                    'lat': float(venue_lat),
+                    'lng': float(venue_lng)
+                },
                 'available_times': available_times_info
             })
 
@@ -86,7 +96,7 @@ def process_venues():
 def index():
     current_date = datetime.now().strftime('%Y-%m-%d')
     max_date = (datetime.now() + timedelta(days=5)).strftime('%Y-%m-%d')
-    return render_template('index.html', min_date=current_date, max_date=max_date)
+    return render_template('index.html', min_date=current_date, max_date=max_date, google_maps_api_key=google_maps_api_key)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -14,7 +14,7 @@ Requirements
 Enable virtual environment (optional)
 ```
 $ python -m venv .venv
-$ . .venv/bin/activate
+$ .venv/Scripts/activate
 ```
 
 Install dependencies
