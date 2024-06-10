@@ -3,14 +3,15 @@ from flask import Flask, request, jsonify, render_template
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import time
+from dotenv import load_dotenv
 
 # Import functions from your script
 from prototype_script import get_venues, process_venue
 
 app = Flask(__name__)
-
+load_dotenv()
 # Get API key from environment variable
-google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
+google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
 
 @app.route('/process_venues', methods=['GET'])
 def process_venues():

@@ -22,6 +22,12 @@ Install dependencies
 $ pip install -r requirements.txt
 ```
 
+Copy env file and add api key
+```
+$ cp -- .env.copythis .env
+```
+Then add your google api key
+
 Run the code in debug mode
 ```
 $ python flask_app.py
