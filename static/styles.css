@@ -5,6 +5,12 @@ body {
     background-color: #f4f4f4;
 }
 
+.github-link {
+    display: block;
+    text-align: center;
+    margin: 1em;
+}
+
 .container {
     max-width: 800px;
     margin: 20px auto;
