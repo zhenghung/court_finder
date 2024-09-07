@@ -1,12 +1,16 @@
 const fetchDataBtn = document.getElementById('fetchDataBtn');
 const datePicker = document.getElementById('datePicker');
 const venueDataDiv = document.getElementById('venueData');
-const mapDiv = document.getElementById('googleMap');
 const loader = document.getElementById('loader'); // Get loading animation element
 
 let map;
-let markers = [];
-let infoWindow = null;
+let infoWindow;
+
+// Set date picker to default to tomorrow
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+datePicker.value = tomorrow.toISOString().split('T')[0];
 
 async function initMap() {
     // Center the map on London, UK
@@ -19,21 +23,12 @@ async function initMap() {
         center: london,
         zoom: zoomLevel,
     });
+
+    // Initialize a single info window for reuse
+    infoWindow = new google.maps.InfoWindow();
 }
 
 initMap();
-
-document.addEventListener("DOMContentLoaded", function() {
-    const datePicker = document.getElementById('datePicker');
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1); // Set to tomorrow
-    const year = tomorrow.getFullYear();
-    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const day = String(tomorrow.getDate()).padStart(2, '0');
-    const tomorrowFormatted = `${year}-${month}-${day}`;
-
-    datePicker.value = tomorrowFormatted;
-});
 
 fetchDataBtn.addEventListener('click', async () => {
     const date = datePicker.value;
@@ -56,52 +51,10 @@ fetchDataBtn.addEventListener('click', async () => {
         venueDataDiv.innerHTML = '';
 
         if (response.ok) {
-            // Clear previous markers
-            markers.forEach(marker => marker.setMap(null));
-            markers = [];
-
             if (data.venues_with_times.length === 0) {
                 venueDataDiv.textContent = 'No venues found for the selected date.';
             } else {
-                // Loop through each venue and add a marker to the map
                 data.venues_with_times.forEach(venue => {
-                    const marker = new google.maps.Marker({
-                        position: { lat: venue.venue_coord.lat, lng: venue.venue_coord.lng },
-                        map: map,
-                        title: venue.venue_name,
-                    });
-
-                    // Create info window content
-                    const infoWindowContent = `
-                        <h3>${venue.venue_name}</h3>
-                        <p>${venue.venue_location}</p>
-                        <h4>Available Times:</h4>
-                        <ul>
-                            ${venue.available_times.map(time => `<li>${time.starts_at_12h} - ${time.ends_at_12h}</li>`).join('')}
-                        </ul>
-                    `;
-
-                    // Create info window
-                    const newInfoWindow = new google.maps.InfoWindow({
-                        content: infoWindowContent,
-                    });
-
-                    // Add click event listener to marker
-                    marker.addListener('click', () => {
-                        // Close previous info window if exists
-                        if (infoWindow) {
-                            infoWindow.close();
-                        }
-                        // Open new info window
-                        newInfoWindow.open(map, marker);
-                        // Set new info window as current
-                        infoWindow = newInfoWindow;
-                    });
-
-                    // Add marker to markers array
-                    markers.push(marker);
-
-                    // Add venue data to venueDataDiv
                     const venueDiv = document.createElement('div');
                     venueDiv.className = 'venue';
                     venueDiv.innerHTML = `
@@ -111,7 +64,7 @@ fetchDataBtn.addEventListener('click', async () => {
                     `;
 
                     const timesList = document.createElement('ul');
-                    venue.available_times.forEach(time => {
+                    venue.available_times.forEach((time, index) => {
                         const listItem = document.createElement('li');
                         listItem.className = 'time';
                         listItem.innerHTML = `
@@ -121,10 +74,38 @@ fetchDataBtn.addEventListener('click', async () => {
                             <p><strong>Spaces available:</strong> ${time.spaces}</p>
                         `;
                         timesList.appendChild(listItem);
+
+                        // Add border-bottom to each time item except the last one
+                        if (index !== venue.available_times.length - 1) {
+                            listItem.style.borderBottom = '1px solid #ccc';
+                            listItem.style.paddingBottom = '10px'; // Optional: Add some padding between items
+                        }
                     });
 
                     venueDiv.appendChild(timesList);
                     venueDataDiv.appendChild(venueDiv);
+
+                    // Add marker to the map
+                    const marker = new google.maps.Marker({
+                        position: { lat: venue.venue_coord.lat, lng: venue.venue_coord.lng },
+                        map: map,
+                        title: venue.venue_name,
+                    });
+
+                    // Add click event to marker to show info window
+                    marker.addListener('click', () => {
+                        infoWindow.setContent(`
+                            <div>
+                                <h2>${venue.venue_name}</h2>
+                                <p>${venue.venue_location}</p>
+                                <h4>Available Times:</h4>
+                                <ul>
+                                    ${venue.available_times.map(time => `<li>${time.starts_at_12h} - ${time.ends_at_12h}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `);
+                        infoWindow.open(map, marker);
+                    });
                 });
             }
         } else {
@@ -137,3 +118,28 @@ fetchDataBtn.addEventListener('click', async () => {
         loader.style.display = 'none';
     }
 });
+
+// Tab functionality
+function openTab(evt, tabName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+// Set the default tab to open
+document.getElementById("defaultOpen").click();

@@ -19,8 +19,20 @@
 
         <!-- Add loading animation -->
         <div class="loader" id="loader"></div>
-        <div id="map"></div>
-        <div id="venueData"></div>
+
+        <!-- Tabbed view -->
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'Map')" id="defaultOpen">Map</button>
+            <button class="tablinks" onclick="openTab(event, 'VenueData')">Venue Data</button>
+        </div>
+
+        <div id="Map" class="tabcontent">
+            <div id="map"></div>
+        </div>
+
+        <div id="VenueData" class="tabcontent">
+            <div id="venueData"></div>
+        </div>
     </div>
 
     <script src="./static/main.js"></script>
